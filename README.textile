@@ -1,0 +1,5 @@
+
+h3. Introduction
+
+p. Slf4jExt provides a mechanism to configure Slf4j / Log4j using configuration files that are package and runtime environment specific.
+
