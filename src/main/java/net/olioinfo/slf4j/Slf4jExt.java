@@ -25,13 +25,28 @@ import java.util.Properties;
  * <p>Lightweight wrapper to SL4j to exploit EEProperties to handle logging configurations for multiple components and
  * runtime environments. It currently uses SL4J as the primary interface, and configures using Log4j settings.</p>
  *
- * <p>See the documentation EEProperties, the configuration tool used to achieve this. In particular, the
- * runtime environment setting exploits the EEProperties bootstrap mechanism.</p>
+ * <h3>Basic usage</h3>
+ * <pre>
+ * Slf4jExt.sConfigureLogging(some.class);
+ * </pre>
  *
+ * <p>This will configure logging using the files 'log4j-defaults.properties' and 'log4j-development.properties'
+ * in the package location (or corresponding external location) where 'some.class' loaded from.</p>
  *
+ * <p>The default names for the configuration files are:</p>
+ * <ul>
+ * <li>log4j-defaults.properties</ii>
+ * <li>log4j-production.properties</li>
+ * <li>log4j-development.properties</li>
+ * <li>log4j-test.properties</li>
+ * </ul>
+ * 
+ * <p>See the documentation for EEProperties, the configuration tool used to achieve this. In particular, the
+ * runtime environment setting is that specified by the EEProperties bootstrap mechanism.</p>
  *
  * @author Tracy Flynn
- * @since Jun 27, 2010
+ * @version 2.0
+ * @since 2.0
  */
 public class Slf4jExt {
 
