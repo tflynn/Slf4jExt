@@ -45,7 +45,7 @@ import java.util.Properties;
  * runtime environment setting is that specified by the EEProperties bootstrap mechanism.</p>
  *
  * @author Tracy Flynn
- * @version 2.0
+ * @version 2.1
  * @since 2.0
  */
 public class Slf4jExt {
