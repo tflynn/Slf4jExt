@@ -48,6 +48,12 @@ import java.util.Properties;
  * <p>See the documentation for EEProperties, the configuration tool used to achieve this. In particular, the
  * runtime environment setting is that specified by the EEProperties bootstrap mechanism.</p>
  *
+ * <p>To provide detailed tracing to the System.out device, specify the following: (Does not use logging) </p>
+ *
+ * <ul><li>-Dnet.olioinfo.slf4j.consoleTracing=true</li></ul>
+ *
+ *
+ *
  * @author Tracy Flynn
  * @version 2.2
  * @since 2.0
@@ -57,7 +63,7 @@ public class Slf4jExt {
     /**
      * Singleton instance
      */
-    private static Slf4jExt instance = new Slf4jExt();
+    private static Slf4jExt instance = null;
 
 
     /**
@@ -71,9 +77,28 @@ public class Slf4jExt {
     private Properties allProperties = new Properties();
 
     /**
+      * Console tracing state
+     */
+    private boolean consoleTracing = false;
+
+
+    /**
+     * Create an instance of the class
+     *
+     */
+    public Slf4jExt() {
+        if ((System.getProperty("net.olioinfo.slf4j.consoleTracing") != null ) && System.getProperty("net.olioinfo.slf4j.consoleTracing").equals("true")) {
+            this.consoleTracing = true;
+        }
+    }
+    
+    /**
      * Get singleton instance
      */
     public static Slf4jExt singleton() {
+        if (Slf4jExt.instance == null) {
+            Slf4jExt.instance = new Slf4jExt();
+        }
         return Slf4jExt.instance;
     }
 
@@ -119,6 +144,10 @@ public class Slf4jExt {
 
 
         this.eeProperties.loadAndMergeConfigurations(klass,this.allProperties,combinedOptions);
+
+        if (this.consoleTracing) {
+            this.allProperties.list(System.out);
+        }
 
         org.apache.log4j.PropertyConfigurator.configure(this.allProperties);
 
