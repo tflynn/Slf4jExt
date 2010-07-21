@@ -33,6 +33,10 @@ import java.util.Properties;
  * <p>This will configure logging using the files 'log4j-defaults.properties' and 'log4j-development.properties'
  * in the package location (or corresponding external location) where 'some.class' loaded from.</p>
  *
+ * <p>Since Slf4j uses EEProperties to manage its configuration files, it automatically gets variable substitution
+ * in both property names and values from the System properties and System environment in that order using the
+ * standard ${varName} syntax. </p>
+ *
  * <p>The default names for the configuration files are:</p>
  * <ul>
  * <li>log4j-defaults.properties</ii>
@@ -45,7 +49,7 @@ import java.util.Properties;
  * runtime environment setting is that specified by the EEProperties bootstrap mechanism.</p>
  *
  * @author Tracy Flynn
- * @version 2.1
+ * @version 2.2
  * @since 2.0
  */
 public class Slf4jExt {
