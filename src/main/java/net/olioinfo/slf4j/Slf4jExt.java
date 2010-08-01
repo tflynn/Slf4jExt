@@ -17,6 +17,7 @@ package net.olioinfo.slf4j;
 import net.olioinfo.eeproperties.EEProperties;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -59,6 +60,7 @@ import java.util.Properties;
  * @since 2.0
  */
 public class Slf4jExt {
+
 
     /**
      * Singleton instance
@@ -151,7 +153,8 @@ public class Slf4jExt {
 
         org.apache.log4j.PropertyConfigurator.configure(this.allProperties);
 
-
+        new Slf4jLoadDefinition(klass,this.allProperties,combinedOptions);
+        
     }
 
     /**
@@ -163,5 +166,27 @@ public class Slf4jExt {
         return this.allProperties;
     }
 
+
+    /**
+     * Relead all the logging settings as originally loaded
+     */
+    public void resetLogging() {
+        ArrayList<Slf4jLoadDefinition> oldLoadDefinitions = Slf4jLoadDefinition.getLoadDefinitions();
+        Slf4jLoadDefinition.resetLoadDefinitions();
+        for (Slf4jLoadDefinition loadDefinition : oldLoadDefinitions ) {
+            Properties oldProperties = loadDefinition.getProperties();
+            org.apache.log4j.PropertyConfigurator.configure(oldProperties);
+            if (this.consoleTracing) {
+                oldProperties.list(System.out);
+            }
+        }
+    }
+
+    /**
+     * Relead all the logging settings as originally loaded (singleton)
+     */
+    public static void sResetLogging() {
+        Slf4jExt.singleton().resetLogging();;
+    }
 
 }
