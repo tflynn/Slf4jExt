@@ -31,7 +31,7 @@ public class Slf4jLoadDefinition {
 
     private Properties properties = new Properties();
 
-    private HashMap<String,String> options = null;
+    private HashMap<String,String> options = new HashMap<String,String>();
 
     /**
      * Load definitions

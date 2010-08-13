@@ -14,13 +14,13 @@
  */
 package net.olioinfo.slf4j;
 
-import org.testng.Assert;
-import org.testng.annotations.*;
-
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +31,26 @@ import org.slf4j.LoggerFactory;
  * @author Tracy Flynn
  * @since Jun 27, 2010
  */
-@Test
-public class Slf4jExtTest {
+public class Slf4jExtTest extends TestCase {
+
+    /**
+     * Create the test case
+     *
+     * @param testName name of the test case
+     */
+    public Slf4jExtTest( String testName )
+    {
+        super( testName );
+    }
+
+    /**
+     * @return the suite of tests being tested
+     */
+    public static Test suite()
+    {
+        return new TestSuite( Slf4jExtTest.class );
+    }
+
 
     public void testConfiguration() {
         HashMap<String,String> testOptions = new HashMap<String,String>();
