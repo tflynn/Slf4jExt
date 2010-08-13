@@ -43,8 +43,8 @@ public class Slf4jLoadDefinition {
         for (String propertyName : inputProperties.stringPropertyNames() ) {
             this.properties.put(propertyName,inputProperties.getProperty(propertyName));
         }
-        for (String option : inputOptions.values()) {
-            this.options.put(option,inputOptions.get(option));
+        for (String key : inputOptions.keySet() ) {
+            this.options.put(key,inputOptions.get(key));
         }
         Slf4jLoadDefinition.registerLoadDefinition(this);
     }
