@@ -4,14 +4,14 @@
   <groupId>net.olioinfo</groupId>
   <artifactId>slf4j-ext</artifactId>
   <packaging>jar</packaging>
-  <version>2.4</version>
+  <version>2.5</version>
   <name>slf4j-ext</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -39,7 +39,7 @@
       <dependency>
         <groupId>net.olioinfo</groupId>
         <artifactId>eeproperties</artifactId>
-        <version>2.7</version>
+        <version>2.8</version>
       </dependency>
       
   </dependencies>
@@ -58,6 +58,21 @@
             </plugin>
         </plugins>
     </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <reportOutputDirectory>${project.reporting.outputDirectory}</reportOutputDirectory>
+          <destDir>../../docs</destDir>
+          <bottom>Copyright 2009-2010 Tracy Flynn</bottom>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 
 
     <repositories>

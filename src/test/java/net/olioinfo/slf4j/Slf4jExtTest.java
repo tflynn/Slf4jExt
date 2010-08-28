@@ -17,10 +17,10 @@ package net.olioinfo.slf4j;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
+import net.olioinfo.eeproperties.EEProperties;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,32 +31,14 @@ import org.slf4j.LoggerFactory;
  * @author Tracy Flynn
  * @since Jun 27, 2010
  */
-public class Slf4jExtTest extends TestCase {
+public class Slf4jExtTest {
 
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public Slf4jExtTest( String testName )
-    {
-        super( testName );
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( Slf4jExtTest.class );
-    }
-
-
+    @Test
     public void testConfiguration() {
         HashMap<String,String> testOptions = new HashMap<String,String>();
         testOptions.put("net.olioinfo.eeproperties.configurationFile.prefix","test-log4j-");
         Slf4jExt slf4jExt = new Slf4jExt();
-        slf4jExt.configureLogging(Slf4jExt.class,testOptions);
+        slf4jExt.configureLogging(Slf4jExt.class,testOptions,null);
 
         Properties properties = slf4jExt.getConfiguration();
 
@@ -72,5 +54,29 @@ public class Slf4jExtTest extends TestCase {
         logger.trace("This one should not show up on the console");
 
     }
+
+    @Test
+    public void testLogFileLocation() {
+        EEProperties eeProperties = new EEProperties();
+        String testDir = String.format("%s%s", System.getProperty("user.home"), "/Temp");
+        eeProperties.put("log.dir", testDir );
+        HashMap<String,String> testOptions = new HashMap<String,String>();
+        testOptions.put("net.olioinfo.eeproperties.configurationFile.prefix","test-log4j-");
+        Slf4jExt slf4jExt = new Slf4jExt();
+        slf4jExt.configureLogging(Slf4jExt.class,testOptions,eeProperties);
+
+    }
+    @Test
+    public void testLogFileLocationNotAccessible() {
+        EEProperties eeProperties = new EEProperties();
+        String testDir = "/var/log";
+        eeProperties.put("log.dir", testDir );
+        HashMap<String,String> testOptions = new HashMap<String,String>();
+        testOptions.put("net.olioinfo.eeproperties.configurationFile.prefix","test-log4j-");
+        Slf4jExt slf4jExt = new Slf4jExt();
+        slf4jExt.configureLogging(Slf4jExt.class,testOptions,eeProperties);
+
+    }
+
 }
 
