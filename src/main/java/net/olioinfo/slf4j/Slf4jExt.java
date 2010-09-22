@@ -122,7 +122,7 @@ import java.util.Properties;
  *
  *
  * @author Tracy Flynn
- * @version 2.5
+ * @version 2.6
  * @since 2.0
  */
 public class Slf4jExt {
