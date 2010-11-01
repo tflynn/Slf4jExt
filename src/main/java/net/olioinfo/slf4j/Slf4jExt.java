@@ -394,8 +394,8 @@ public class Slf4jExt {
         
         // If the prefix value hasn't been set externally, then default
         // the value to the first existing directory in the standard list
-        if ( loggingDirSettingsPropertyNames.contains(loggingPrefix)) {
-            
+        if ( loggingDirSettingsPropertyNames.contains(loggingPrefix) || (System.getProperty(loggingPrefix) != null) ) {
+           writableDirectoryFound = true; 
         }
         else  {
             boolean lookForMore = true;
