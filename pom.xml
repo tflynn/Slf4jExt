@@ -56,6 +56,18 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <version>2.7</version>
+              <configuration>
+                <show>protected</show>
+                <nohelp>true</nohelp>
+                <reportOutputDirectory>${basedir}</reportOutputDirectory>
+                <destDir>docs</destDir>
+              </configuration>
+            </plugin>
+            
         </plugins>
     </build>
 
