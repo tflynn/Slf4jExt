@@ -18,7 +18,9 @@ import java.io.File;
 import net.olioinfo.eeproperties.EEProperties;
 
 
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -251,7 +253,8 @@ public class Slf4jExt {
         this.eeProperties.loadAndMergeConfigurations(klass,this.allProperties,combinedOptions);
 
         if (this.consoleTracing) {
-            this.allProperties.list(System.out);
+            System.out.println("SLF4JExt dumping current properties");
+            listProperties(this.allProperties,System.out);
         }
 
         extractAndSetLoggingDirProperties(options,eeProperties);
@@ -282,7 +285,8 @@ public class Slf4jExt {
             Properties oldProperties = loadDefinition.getProperties();
             org.apache.log4j.PropertyConfigurator.configure(oldProperties);
             if (this.consoleTracing) {
-                oldProperties.list(System.out);
+                System.out.println("SLF4JExt.reset dumping old properties");
+                listProperties(oldProperties,System.out);
             }
         }
     }
@@ -399,10 +403,26 @@ public class Slf4jExt {
         }
         else  {
             boolean lookForMore = true;
+            if (this.consoleTracing) {
+                System.out.println(String.format("Slf4jExt: Current settings: user.dir %s user.home %s",System.getProperty("user.dir"),System.getProperty("user.home")));
+            }
             for (String standardLocation : Slf4jExt.LOGFILE_DIR_STANDARD_LOCATIONS) {
                 if (lookForMore) {
+                    if (this.consoleTracing) {
+                        System.out.println(String.format("Slf4jExt: Examining %s as a possible logging directory",standardLocation));
+                    }
+
                     // Make sure to substitute value first
                     String substitutedValue = EEProperties.substituteVariables(standardLocation, null);
+                    if (this.consoleTracing) {
+                        System.out.println(String.format("Slf4jExt: location %s expands to %s",standardLocation,substitutedValue));    
+                    }
+                    // Tomcat/Intellij hack
+                    if (substitutedValue.indexOf("/bin") > -1 ) {
+                        String originalValue = "" + substitutedValue;
+                        substitutedValue = substitutedValue.replaceAll("\\/bin","");
+                        System.out.println(String.format("Slf4jExt: applied Intellij/Tomcat patch to original location %s and converted to %s",originalValue,substitutedValue));    
+                    }
 
                     File fileLocation = new File(substitutedValue);
                     if ( fileLocation.exists() && fileLocation.canWrite() ) {
@@ -419,5 +439,20 @@ public class Slf4jExt {
             System.out.println("Slf4jExt: Warning: No writable logging directory found");
         }
 
+    }
+
+    /**
+     * List complete keys and values to specified stream
+     *
+     * @param properties
+     * @param out
+     */
+    private void listProperties(Properties properties, PrintStream out) {
+        Enumeration propertyNames = properties.propertyNames();
+        while (propertyNames.hasMoreElements()) {
+            String propertyName = (String) propertyNames.nextElement();
+            String propertyValue = properties.getProperty(propertyName);
+            out.println(String.format("%s=%s",propertyName,propertyValue));
+        }
     }
 }
