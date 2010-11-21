@@ -116,11 +116,11 @@ import java.util.Properties;
  *
  * <h3>Web container support</h3>
  *
- * A feature is available that attempts to configure 'log.dir' to the './logs' directory of a Tommcat web container.
+ * A feature is available that attempts to configure 'log.dir' to the './logs' directory of a Tomcat web container.
  *
  * It is enabled and disabled using the Java property:
  *
- * -Dnet.olioinfo.slf4j.servletContainerTomcatSupportEnable=true \ false
+ * <ul><li>-Dnet.olioinfo.slf4j.servletContainerTomcatSupportEnable=true  | false</li></ul>
  *
  * It is enabled by default
  * 
