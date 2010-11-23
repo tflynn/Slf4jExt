@@ -176,6 +176,12 @@ public class Slf4jExt {
 
 
     /**
+     * Default runtime environment
+     */
+    private String runtimeEnvironment = "development";
+
+    
+    /**
      * Create an instance of the class
      *
      */
@@ -244,9 +250,10 @@ public class Slf4jExt {
         }
 
         // Inherit or override the active runtime environment setting
-        options.put("net.olioinfo.eeproperties.runtime.environment",eeProperties.getProperty("net.olioinfo.eeproperties.runtime.environment"));
+        this.runtimeEnvironment = eeProperties.getProperty("net.olioinfo.eeproperties.runtime.environment");
+        options.put("net.olioinfo.eeproperties.runtime.environment",this.runtimeEnvironment);
         if (this.consoleTracing) {
-            System.out.println(String.format("consoleTrace: Sl4jExt: setting runtime to %s in private EEProperties instance",(String) options.get("net.olioinfo.eeproperties.runtime.environment")));    
+            System.out.println(String.format("consoleTrace: Sl4jExt: setting runtime to %s in private EEProperties instance",this.runtimeEnvironment));
         }
         this.eeProperties = new EEProperties(options);
 
@@ -254,6 +261,7 @@ public class Slf4jExt {
         combinedOptions.put("net.olioinfo.eeproperties.configurationFile.prefix","log4j-");
         combinedOptions.put("net.olioinfo.eeproperties.configurationFile.suffix",null);
         combinedOptions.put("net.olioinfo.eeproperties.configurationFile.extension","properties");
+        combinedOptions.put("net.olioinfo.eeproperties.runtime.environment",this.runtimeEnvironment);
 
         if (options != null) combinedOptions.putAll(options);
 
