@@ -18,9 +18,7 @@ import java.io.File;
 import net.olioinfo.eeproperties.EEProperties;
 
 
-import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -114,26 +112,17 @@ import java.util.Properties;
  *
  * <p>The first directory that is present and writable to the process this will be used as the value for 'log.dir'.</p>
  *
- * <h3>Web container support</h3>
- *
- * A feature is available that attempts to configure 'log.dir' to the './logs' directory of a Tomcat web container.
- *
- * It is enabled and disabled using the Java property:
- *
- * <ul><li>-Dnet.olioinfo.slf4j.servletContainerTomcatSupportEnable=true  | false</li></ul>
- *
- * It is enabled by default
  * 
  * <h3>Debugging</h3>
  *
- * <p>To provide detailed tracing to the System.out device, specify the following Java property: (Does not use logging) </p>
+ * <p>To provide detailed tracing to the System.out device, specify the following: (Does not use logging) </p>
  *
  * <ul><li>-Dnet.olioinfo.slf4j.consoleTracing=true</li></ul>
  *
  *
  *
  * @author Tracy Flynn
- * @version 2.7
+ * @version 2.6
  * @since 2.0
  */
 public class Slf4jExt {
@@ -167,7 +156,7 @@ public class Slf4jExt {
     /**
      * Singleton instance
      */
-    private static Slf4jExt singletonInstance = null;
+    private static Slf4jExt instance = null;
 
 
     /**
@@ -185,30 +174,14 @@ public class Slf4jExt {
      */
     private boolean consoleTracing = false;
 
-    /**
-     * Enable Tomcat servlet container support
-     */
-    private boolean servletContainerTomcatSupportEnable = true;
-    
 
     /**
      * Create an instance of the class
      *
      */
     public Slf4jExt() {
-        if (EEProperties.testSystemProperty("net.olioinfo.slf4j.consoleTracing","true")) {
+        if ((System.getProperty("net.olioinfo.slf4j.consoleTracing") != null ) && System.getProperty("net.olioinfo.slf4j.consoleTracing").equals("true")) {
             this.consoleTracing = true;
-        }
-        if (System.getProperty("net.olioinfo.slf4j.servletContainerTomcatSupportEnable") != null ) {
-            if (System.getProperty("net.olioinfo.slf4j.servletContainerTomcatSupportEnable").equals("true")) {
-                this.servletContainerTomcatSupportEnable = true;
-            }
-            if (System.getProperty("net.olioinfo.slf4j.servletContainerTomcatSupportEnable").equals("false")) {
-                this.servletContainerTomcatSupportEnable = false;
-            }
-        }
-        if (this.consoleTracing) {
-            System.out.println(String.format("consoleTrace: SLF4JExt servletContainerTomcatSupportEnable %s", this.servletContainerTomcatSupportEnable ? "true" : "false"));
         }
     }
     
@@ -216,13 +189,10 @@ public class Slf4jExt {
      * Get singleton instance
      */
     public static Slf4jExt singleton() {
-        if (Slf4jExt.singletonInstance == null) {
-            if (EEProperties.testSystemProperty("net.olioinfo.slf4j.consoleTracing","true")) {
-                System.out.println(String.format("consoleTrace: SLF4JExt Creating singleton instance"));   
-            }
-            Slf4jExt.singletonInstance = new Slf4jExt();
+        if (Slf4jExt.instance == null) {
+            Slf4jExt.instance = new Slf4jExt();
         }
-        return Slf4jExt.singletonInstance;
+        return Slf4jExt.instance;
     }
 
     /**
@@ -265,27 +235,33 @@ public class Slf4jExt {
      */
     public void configureLogging(Class klass, HashMap<String,String> options, EEProperties eeProperties ) {
 
-        if (this.consoleTracing) {
-            System.out.println("consoleTrace: SLF4JExt configuring logging for class " + klass.getName());
+        if (eeProperties == null) {
+            eeProperties = EEProperties.singleton();
         }
+
         if (options == null) {
             options = new HashMap<String,String>();
         }
 
+        // Inherit or override the active runtime environment setting
+        options.put("net.olioinfo.eeproperties.runtime.environment",eeProperties.getProperty("net.olioinfo.eeproperties.runtime.environment"));
+        if (this.consoleTracing) {
+            System.out.println(String.format("consoleTrace: Sl4jExt: setting runtime to %s in private EEProperties instance",(String) options.get("net.olioinfo.eeproperties.runtime.environment")));    
+        }
         this.eeProperties = new EEProperties(options);
 
         HashMap<String,String> combinedOptions = new HashMap<String,String>();
         combinedOptions.put("net.olioinfo.eeproperties.configurationFile.prefix","log4j-");
         combinedOptions.put("net.olioinfo.eeproperties.configurationFile.suffix",null);
         combinedOptions.put("net.olioinfo.eeproperties.configurationFile.extension","properties");
+
         if (options != null) combinedOptions.putAll(options);
 
 
         this.eeProperties.loadAndMergeConfigurations(klass,this.allProperties,combinedOptions);
 
         if (this.consoleTracing) {
-            System.out.println("consoleTrace: SLF4JExt dumping current properties");
-            listProperties(this.allProperties,System.out);
+            this.allProperties.list(System.out);
         }
 
         extractAndSetLoggingDirProperties(options,eeProperties);
@@ -293,11 +269,7 @@ public class Slf4jExt {
         org.apache.log4j.PropertyConfigurator.configure(this.allProperties);
 
         new Slf4jLoadDefinition(klass,this.allProperties,combinedOptions);
-
-        if (this.consoleTracing) {
-            System.out.println("consoleTrace: SLF4JExt: finished configuring logging for class " + klass.getName());
-        }
-
+        
     }
 
     /**
@@ -320,8 +292,7 @@ public class Slf4jExt {
             Properties oldProperties = loadDefinition.getProperties();
             org.apache.log4j.PropertyConfigurator.configure(oldProperties);
             if (this.consoleTracing) {
-                System.out.println("consoleTrace: SLF4JExt.reset dumping old properties");
-                listProperties(oldProperties,System.out);
+                oldProperties.list(System.out);
             }
         }
     }
@@ -438,20 +409,10 @@ public class Slf4jExt {
         }
         else  {
             boolean lookForMore = true;
-            if (this.consoleTracing) {
-                System.out.println(String.format("consoleTrace: Slf4jExt: Current settings: user.dir %s user.home %s",System.getProperty("user.dir"),System.getProperty("user.home")));
-            }
             for (String standardLocation : Slf4jExt.LOGFILE_DIR_STANDARD_LOCATIONS) {
                 if (lookForMore) {
-                    if (this.consoleTracing) {
-                        System.out.println(String.format("consoleTrace: Slf4jExt: Examining %s as a possible logging directory",standardLocation));
-                    }
-
                     // Make sure to substitute value first
                     String substitutedValue = EEProperties.substituteVariables(standardLocation, null);
-                    if (this.consoleTracing) {
-                        System.out.println(String.format("consoleTrace: Slf4jExt: location %s expands to %s",standardLocation,substitutedValue));
-                    }
 
                     File fileLocation = new File(substitutedValue);
                     if ( fileLocation.exists() && fileLocation.canWrite() ) {
@@ -463,98 +424,10 @@ public class Slf4jExt {
                 }
 
             }
-            if (lookForMore && (!writableDirectoryFound)) {
-                if (servletContainerTomcatSupportEnable) {
-                    if (this.consoleTracing) {
-                        System.out.println(String.format("consoleTrace: Slf4jExt: No writable logging directory found in standard locations, and servlet container support for Tomcat is enabled. Going to check a few places ..." ));
-                    }
-                    String tomcatDir = servletContainerTomcatSupport();
-                    if (tomcatDir == null) {
-                        if (this.consoleTracing) {
-                            System.out.println(String.format("consoleTrace: Slf4jExt: No writable Tomcat directory found"));
-                        }
-                    }
-                    else {
-                        System.setProperty(loggingPrefix, tomcatDir);
-                        lookForMore = false;
-                        writableDirectoryFound = true;
-                        if (this.consoleTracing) {
-                            System.out.println(String.format("consoleTrace: Slf4jExt: Defaulting ${log.dir} to writable Tomcat directory found at %s",tomcatDir ));
-                        }
-                    }
-                }
-            }
         }
         if (!writableDirectoryFound) {
             System.out.println("Slf4jExt: Warning: No writable logging directory found");
         }
 
-    }
-
-    /**
-     * List complete keys and values to specified stream
-     *
-     * @param properties
-     * @param out
-     */
-    private void listProperties(Properties properties, PrintStream out) {
-        Enumeration propertyNames = properties.propertyNames();
-        while (propertyNames.hasMoreElements()) {
-            String propertyName = (String) propertyNames.nextElement();
-            String propertyValue = properties.getProperty(propertyName);
-            out.println(String.format("%s=%s",propertyName,propertyValue));
-        }
-    }
-
-    /**
-     * Try to figure out if the logging is running in what looks like a Tomcat container and find the log directory
-     *
-     * @return String Fully qualified log directory or null if none found
-     */
-    private String servletContainerTomcatSupport() {
-
-
-        String tomcatLogDir = null;
-
-        try {
-            // First, try one level up and look for both ./conf/tomcat-users.xml and ./webapps subdirectories
-            String userDir = System.getProperty("user.dir");
-            String confFile = userDir + "/../conf/tomcat-users.xml";
-            String webappsDir = userDir + "/../webapps";
-            File confFileLocation = new File(confFile);
-            File webappsDirLocation = new File(webappsDir);
-            if ( confFileLocation.exists() && webappsDirLocation.exists() ) {
-                String logDir = (new File(userDir + "/../logs")).getCanonicalPath();
-                File logDirLocation = new File(logDir);
-                if (logDirLocation.exists() && logDirLocation.canWrite()) {
-                    tomcatLogDir = logDir;
-                    if (this.consoleTracing) {
-                        System.out.println(String.format("consoleTrace: Slf4jExt: Found writable Tomcat directory relative to current directory %s",tomcatLogDir));
-                    }
-                }
-
-            }
-            if (tomcatLogDir == null) {
-                // Last, try the standard location
-                String catalinaHome = System.getenv("CATALINA_HOME");
-                String logDir = catalinaHome + "/logs";
-                File logDirLocation = new File(logDir);
-                if (logDirLocation.exists() && logDirLocation.canWrite()) {
-                    tomcatLogDir = logDir;
-                    if (this.consoleTracing) {
-                        System.out.println(String.format("consoleTrace: Slf4jExt: Found writable Tomcat directory relative to CATALINA_HOME %s",tomcatLogDir));
-                    }
-                }
-            }
-
-        }
-        catch (Exception ex) {
-            System.out.println("Slf4jExt: Error while trying to find Tomcat log directory. " + ex.toString());
-            ex.printStackTrace(System.out);
-            tomcatLogDir = null;
-        }
-
-
-        return tomcatLogDir;
     }
 }
