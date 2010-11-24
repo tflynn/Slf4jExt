@@ -249,12 +249,6 @@ public class Slf4jExt {
             options = new HashMap<String,String>();
         }
 
-        // Inherit or override the active runtime environment setting
-        this.runtimeEnvironment = eeProperties.getProperty("net.olioinfo.eeproperties.runtime.environment");
-        options.put("net.olioinfo.eeproperties.runtime.environment",this.runtimeEnvironment);
-        if (this.consoleTracing) {
-            System.out.println(String.format("consoleTrace: Sl4jExt: setting runtime to %s in private EEProperties instance",this.runtimeEnvironment));
-        }
         this.eeProperties = new EEProperties(options);
 
         HashMap<String,String> combinedOptions = new HashMap<String,String>();
