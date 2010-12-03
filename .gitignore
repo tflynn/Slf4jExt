@@ -2,3 +2,4 @@
 .idea/tasks.xml
 target/
 logs/
+projectFilesBackup*
