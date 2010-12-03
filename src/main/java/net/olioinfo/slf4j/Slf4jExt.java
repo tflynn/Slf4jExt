@@ -277,7 +277,6 @@ public class Slf4jExt {
         combinedOptions.put("net.olioinfo.eeproperties.configurationFile.prefix","log4j-");
         combinedOptions.put("net.olioinfo.eeproperties.configurationFile.suffix",null);
         combinedOptions.put("net.olioinfo.eeproperties.configurationFile.extension","properties");
-        combinedOptions.put("net.olioinfo.eeproperties.runtime.environment",this.runtimeEnvironment);
 
         if (options != null) combinedOptions.putAll(options);
 
@@ -285,6 +284,7 @@ public class Slf4jExt {
         this.eeProperties.loadAndMergeConfigurations(klass,this.allProperties,combinedOptions);
 
         if (this.consoleTracing) {
+            System.out.println("consoleTrace: Sl4fjExt about to dump properties after initial load");
             for (String propertyName : this.allProperties.stringPropertyNames()) {
                 System.out.println(String.format("%s=%s",propertyName, this.allProperties.getProperty(propertyName)));
             }
@@ -316,6 +316,13 @@ public class Slf4jExt {
      */
     public void resetLogging() {
         ArrayList<Slf4jLoadDefinition> oldLoadDefinitions = Slf4jLoadDefinition.getLoadDefinitions();
+        if (this.consoleTracing) {
+            System.out.println("consoleTrace: Slf4jExt: dumping old properties before reload");
+            for (String propertyName : this.allProperties.stringPropertyNames()) {
+                System.out.println(String.format("%s=%s",propertyName, this.allProperties.getProperty(propertyName)));
+            }
+
+        }
         Slf4jLoadDefinition.resetLoadDefinitions();
         for (Slf4jLoadDefinition loadDefinition : oldLoadDefinitions ) {
             Properties oldProperties = loadDefinition.getProperties();
@@ -448,6 +455,10 @@ public class Slf4jExt {
         }
         else  {
             boolean lookForMore = true;
+            if (this.consoleTracing) {
+                System.out.println(String.format("consoleTrace: Slf4jExt: Current settings: user.dir %s user.home %s",System.getProperty("user.dir"),System.getProperty("user.home")));
+            }
+
             for (String standardLocation : Slf4jExt.LOGFILE_DIR_STANDARD_LOCATIONS) {
                 if (lookForMore) {
                     // Make sure to substitute value first
@@ -456,7 +467,7 @@ public class Slf4jExt {
                         substitutedValue = standardLocation;
                     }
                     if (this.consoleTracing) {
-                       System.out.println(String.format("Slf4jExt.extractAndSetLoggingDirProperties checking directory %s to see if it exists and is writable",substitutedValue));
+                        System.out.println(String.format("consoleTrace: Slf4jExt: location %s expands to %s",standardLocation,substitutedValue));
                     }
                     File fileLocation = new File(substitutedValue);
                     if ( fileLocation.exists() && fileLocation.canWrite() ) {
