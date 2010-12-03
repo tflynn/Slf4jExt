@@ -415,7 +415,9 @@ public class Slf4jExt {
                 if (lookForMore) {
                     // Make sure to substitute value first
                     String substitutedValue = EEProperties.substituteVariables(standardLocation, null);
-
+                    if (substitutedValue == null) {
+                        substitutedValue = standardLocation;
+                    }
                     File fileLocation = new File(substitutedValue);
                     if ( fileLocation.exists() && fileLocation.canWrite() ) {
                         System.setProperty(loggingPrefix, substitutedValue);
