@@ -407,9 +407,11 @@ public class Slf4jExt {
             }
         }
         if (this.consoleTracing) {
-            System.out.println("Slf4jExt.extractAndSetLoggingDirProperties loggingDirSettingsPropertyNames");
-            for (String propertyName : loggingDirSettingsPropertyNames) {
-                System.out.println(propertyName);
+            if (loggingDirSettingsPropertyNames.size() > 0) {
+                System.out.println("consoleTrace: Slf4jExt about to list loggingDirSettingsPropertyNames");
+                for (String propertyName : loggingDirSettingsPropertyNames) {
+                    System.out.println(String.format("consoleTrace: Slf4jExt propertyName %s",propertyName));
+                }
             }
         }
 
