@@ -21,6 +21,7 @@ import net.olioinfo.eeproperties.EEProperties;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.lang.StringBuffer;
 
 
 /**
@@ -515,7 +516,17 @@ public class Slf4jExt {
 
         
         if (!writableDirectoryFound) {
-            System.out.println("Slf4jExt: Warning: No writable logging directory found");
+            StringBuffer standardLocations = new StringBuffer();
+            for (String standardLocation : Slf4jExt.LOGFILE_DIR_STANDARD_LOCATIONS) {
+              standardLocations.append(standardLocation);
+              standardLocations.append(" ");
+            }
+            if (servletContainerTomcatSupportEnable) {
+              if (System.getProperty(loggingPrefix) != null) {
+                standardLocations.append(System.getProperty(loggingPrefix));
+              }
+            }
+            System.out.println("Slf4jExt: Warning: No writable logging directory found in any of the standard locations. " + standardLocations);
         }
 
     }
