@@ -120,10 +120,14 @@ import java.lang.StringBuffer;
  *
  * <ul><li>-Dnet.olioinfo.slf4j.consoleTracing=true</li></ul>
  *
+ *<h3>See location of logging directory</h3>
  *
+ *<p>To display location of logging directory selected at startup, specify the following:</p>
  *
+ * <ul><li>-Dnet.olioinfo.slf4j.showLoggingDir=true</li></ul>
+ * 
  * @author Tracy Flynn
- * @version 2.6
+ * @version 2.11
  * @since 2.0
  */
 public class Slf4jExt {
@@ -187,15 +191,22 @@ public class Slf4jExt {
      */
     private boolean servletContainerTomcatSupportEnable = true;
 
-
+    /**
+     * Controls the display of the startup message showing logging directory selected
+     */
+    private boolean showLoggingDir = false;
     
     /**
      * Create an instance of the class
      *
      */
     public Slf4jExt() {
+    	
         if ((System.getProperty("net.olioinfo.slf4j.consoleTracing") != null ) && System.getProperty("net.olioinfo.slf4j.consoleTracing").equals("true")) {
             this.consoleTracing = true;
+        }
+        if ((System.getProperty("net.olioinfo.slf4j.showLoggingDir") != null) && System.getProperty("net.olioinfo.slf4j.showLoggingDir").equalsIgnoreCase("true") ) {
+        	this.showLoggingDir = true;
         }
         if (System.getProperty("net.olioinfo.slf4j.servletContainerTomcatSupportEnable") != null ) {
             if (System.getProperty("net.olioinfo.slf4j.servletContainerTomcatSupportEnable").equals("true")) {
@@ -429,7 +440,9 @@ public class Slf4jExt {
             String propertyValue = getLoggingDirSetting(propertyName,options,eeProperties);
             if (propertyValue != null) {
                 System.setProperty(propertyName,propertyValue);
-                System.out.println(String.format("Slf4jExt: Setting %s to %s", propertyName, propertyValue ));
+                if (this.consoleTracing) {
+                	System.out.println(String.format("Slf4jExt: Setting %s to %s", propertyName, propertyValue ));
+                }
                 File fileLocation = new File(propertyValue);
                 boolean issueWarning = false;
                 if ( fileLocation.exists() ) {
@@ -475,7 +488,9 @@ public class Slf4jExt {
                         System.setProperty(loggingPrefix, substitutedValue);
                         lookForMore = false;
                         writableDirectoryFound = true;
-                        System.out.println(String.format("Slf4jExt: Defaulting %s to %s", loggingPrefix, substitutedValue ));
+                        if (this.showLoggingDir) {
+                        	System.out.println(String.format("Slf4jExt: Defaulting %s to %s", loggingPrefix, substitutedValue ));
+                        }
                         if (this.consoleTracing) {
                            System.out.println(String.format("Slf4jExt.extractAndSetLoggingDirProperties directory %s exists and is writable",substitutedValue));
                         }
